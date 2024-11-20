@@ -3,7 +3,8 @@ export type Track = {
     filename: string,
     albumId: string,
     uri: string,
-    artwork: string
+    artwork: string,
+    artist: string,
     mediaType: string,
     duration: number,
     height: number,
@@ -11,19 +12,8 @@ export type Track = {
     modificationTime: number,
     creationTime: number,
 };
-export type Album = {
-    id: string;
-    name: string;
-    images: Image[];
-};
-export type Artist = {
-    id: string;
-    name: string;
-    images?: Image[];
-};
 
-export type Image = {
-    url: string;
-    height?: number;
-    width?: number;
-};
+export type Playback = {
+    position: number | null,
+    duration: number | undefined,
+}

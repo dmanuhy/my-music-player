@@ -20,7 +20,7 @@ const TrackListItem = ({ track }: TrackListItemProps) => {
             <Image source={track?.artwork ? { uri: track.artwork } : trackIcon} style={styles.image} />
             <View>
                 <Text numberOfLines={1} ellipsizeMode="tail" style={styles.title}>{track?.filename}</Text>
-                <Text style={styles.subTitle}>Unknown Artist</Text>
+                <Text style={styles.subTitle}>{track?.artist}</Text>
             </View>
         </Pressable>
     )

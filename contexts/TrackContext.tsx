@@ -31,11 +31,11 @@ export const TrackProvider = ({ children }: PropsWithChildren) => {
         })
         const tracksWithArtwork = await Promise.all(files.assets.map(async track => {
             try {
-                const data = await getAudioMetadata(track.uri, ["artwork"]);
-                if (data?.metadata?.artwork) {
-                    return { ...track, artwork: data.metadata.artwork };
+                const data = await getAudioMetadata(track.uri, ["artwork", "artist"]);
+                if (data?.metadata) {
+                    return { ...track, artwork: data.metadata?.artwork || "", artist: data.metadata?.artist?.toString() || "Unknown" };
                 } else {
-                    return { ...track, artwork: "" };
+                    return { ...track, artwork: "", artist: "Unknown" };
                 }
             } catch (e) {
             }

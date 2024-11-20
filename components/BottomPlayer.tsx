@@ -1,90 +1,48 @@
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image, Pressable, SafeAreaView, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { usePlayerContext } from '../contexts/PlayerContext';
 import { useEffect, useState } from 'react';
 import { Audio, AVPlaybackStatus } from 'expo-av';
 import { Sound } from 'expo-av/build/Audio';
 import trackIcon from "../assets/icon/track-icon.png"
+import PlayerModal from './PlayerModal';
 
 const BottomPlayer = () => {
-    const [sound, setSound] = useState<Sound>();
-    const [isPlaying, setIsPlaying] = useState(false)
-    const { track } = usePlayerContext()
 
-    const playTrack = async () => {
-        if (sound) {
-            await sound.unloadAsync();
-        }
-
-        if (!track?.uri) {
-            return null;
-        }
-        const { sound: newSound } = await Audio.Sound.createAsync(
-            { uri: track.uri },
-            { shouldPlay: true }
-        )
-        setSound(newSound)
-        newSound.setOnPlaybackStatusUpdate(onPlaybackStatusUpdate)
-        await newSound.playAsync()
-    }
-
-    const onPlaybackStatusUpdate = (status: AVPlaybackStatus) => {
-        if (!status.isLoaded) {
-            return
-        }
-        setIsPlaying(status.isPlaying)
-    }
-
-    const onPlayPause = async () => {
-        if (!sound) {
-            return
-        }
-        if (isPlaying) {
-            await sound.pauseAsync()
-        } else {
-            await sound.playAsync()
-        }
-    }
-
-    useEffect(() => {
-        playTrack()
-    }, [track])
-
-    useEffect(() => {
-        return sound ? () => {
-            sound.unloadAsync()
-        } : undefined
-    }, [sound])
+    const [modalVisible, setModalVisible] = useState(false)
+    const { track, isPlaying, onPlayPause } = usePlayerContext()
 
     if (!track) {
         return null;
     }
 
     return (
-
-        <View style={styles.container}>
-            <View style={styles.content}>
-                <Image source={trackIcon} style={styles.image} />
-                <View style={styles.text}>
-                    <Text numberOfLines={2} ellipsizeMode='tail' style={styles.title}>{track?.filename}</Text>
-                    <Text numberOfLines={1} ellipsizeMode='tail' style={styles?.subtitle}>Unknown Artist</Text>
+        <>
+            <Pressable onPress={() => setModalVisible(true)} style={styles.container}>
+                <View style={styles.content}>
+                    <Image source={track?.artwork ? { uri: track.artwork } : trackIcon} style={styles.image} />
+                    <View style={styles.text}>
+                        <Text numberOfLines={2} ellipsizeMode='tail' style={styles.title}>{track?.filename}</Text>
+                        <Text numberOfLines={1} ellipsizeMode='tail' style={styles?.subtitle}>{track?.artist?.toString() || "Unknown"}</Text>
+                    </View>
                 </View>
-            </View>
-            <View style={styles.action}>
-                <Ionicons
-                    name={'heart-outline'}
-                    size={20}
-                    color={'white'}
-                />
-                <Ionicons
-                    onPress={onPlayPause}
-                    disabled={!track?.uri}
-                    name={isPlaying ? "pause" : "play"}
-                    size={22}
-                    color={track?.uri ? 'white' : 'gray'}
-                />
-            </View>
-        </View>
+                <View style={styles.action}>
+                    <Ionicons
+                        name={'heart-outline'}
+                        size={20}
+                        color={'white'}
+                    />
+                    <Ionicons
+                        onPress={onPlayPause}
+                        disabled={!track?.uri}
+                        name={isPlaying ? "pause" : "play"}
+                        size={22}
+                        color={track?.uri ? 'white' : 'gray'}
+                    />
+                </View>
+            </Pressable>
+            <PlayerModal modalVisible={modalVisible} setModalVisible={setModalVisible} />
+        </>
     );
 };
 
